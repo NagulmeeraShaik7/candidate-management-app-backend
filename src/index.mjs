@@ -1,0 +1,55 @@
+// 📁 index.mjs
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import candidateRoutes from "./apps/candidate/routers/candidate.route.mjs";
+import { errorHandler } from "../src/middleware/error.middleware.mjs";
+
+dotenv.config();
+
+class Server {
+  constructor() {
+    this.app = express();
+    this.port = process.env.PORT || 3300;
+    this.connectDB();
+    this.middlewares();
+    this.routes();
+    this.errorHandling();
+  }
+
+  async connectDB() {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log("MongoDB connected");
+    } catch (err) {
+      console.error("MongoDB connection error:", err);
+      process.exit(1);
+    }
+  }
+
+  middlewares() {
+    this.app.use(cors());
+    this.app.use(express.json());
+  }
+
+  routes() {
+    this.app.use("/api/candidates", candidateRoutes);
+  }
+
+  errorHandling() {
+    this.app.use(errorHandler);
+  }
+
+  listen() {
+    this.app.listen(this.port, () => {
+      console.log(`Server running on port ${this.port}`);
+    });
+  }
+}
+
+const server = new Server();
+server.listen();
