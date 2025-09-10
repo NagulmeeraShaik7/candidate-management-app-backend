@@ -7,11 +7,63 @@ export const PATTERNS = {
   QUALIFICATION: /^[A-Za-z\s]{2,100}$/,
   EXPERIENCE: /^([1-9]|[12]\d|30)$/,
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  OBJECT_ID: /^[0-9a-fA-F]{24}$/
+  OBJECT_ID: /^[0-9a-fA-F]{24}$/,
+  PASSWORD: /^.{6,}$/, // min 6 chars
+  PHONE: /^[0-9]{10}$/, // example candidate validation
 };
 
 // Validation functions
 export const validators = {
+  isValidEmail: (email) => typeof email === "string" && PATTERNS.EMAIL.test(email),
+  isValidPassword: (password) => typeof password === "string" && PATTERNS.PASSWORD.test(password),
+  isValidName: (name) => typeof name === "string" && PATTERNS.NAME.test(name),
+  isValidPhone: (phone) => typeof phone === "string" && PATTERNS.PHONE.test(phone),
+
+  // Auth validators
+  isValidRegister: ({ email, password, name }) => {
+    const errors = [];
+
+    if (!email) errors.push({ field: "email", message: ERROR_MESSAGES.REQUIRED_EMAIL });
+    else if (!validators.isValidEmail(email)) errors.push({ field: "email", message: ERROR_MESSAGES.EMAIL });
+
+    if (!password) errors.push({ field: "password", message: ERROR_MESSAGES.REQUIRED_PASSWORD });
+    else if (!validators.isValidPassword(password)) errors.push({ field: "password", message: ERROR_MESSAGES.PASSWORD });
+
+    if (name && name.trim().length < 2) {
+      errors.push({ field: "name", message: ERROR_MESSAGES.REQUIRED_NAME });
+    }
+
+    return { isValid: errors.length === 0, errors };
+  },
+
+  isValidLogin: ({ email, password }) => {
+    const errors = [];
+
+    if (!email) errors.push({ field: "email", message: ERROR_MESSAGES.REQUIRED_EMAIL });
+    else if (!validators.isValidEmail(email)) errors.push({ field: "email", message: ERROR_MESSAGES.EMAIL });
+
+    if (!password) errors.push({ field: "password", message: ERROR_MESSAGES.REQUIRED_PASSWORD });
+    else if (!validators.isValidPassword(password)) errors.push({ field: "password", message: ERROR_MESSAGES.PASSWORD });
+
+    return { isValid: errors.length === 0, errors };
+  },
+
+  // Candidate validator (example)
+  isValidCandidate: ({ name, email, phone }) => {
+    const errors = [];
+
+    if (!name || !validators.isValidName(name)) {
+      errors.push({ field: "name", message: ERROR_MESSAGES.REQUIRED_NAME });
+    }
+    if (!email || !validators.isValidEmail(email)) {
+      errors.push({ field: "email", message: ERROR_MESSAGES.EMAIL });
+    }
+    if (!phone || !validators.isValidPhone(phone)) {
+      errors.push({ field: "phone", message: ERROR_MESSAGES.REQUIRED_PHONE });
+    }
+
+    return { isValid: errors.length === 0, errors };
+  },
   // Name validation
   isValidName: (name) => {
     return typeof name === 'string' && PATTERNS.NAME.test(name.trim());
@@ -125,7 +177,13 @@ export const ERROR_MESSAGES = {
   SKILLS: 'Skills must be provided as array or comma-separated string',
   REQUIRED: 'This field is required',
   INVALID_ID: 'Invalid ID format',
-  DUPLICATE_EMAIL: 'Email already exists'
+  DUPLICATE_EMAIL: 'Email already exists',
+  EMAIL: "Invalid email format",
+  PASSWORD: "Password must be at least 6 characters long",
+  REQUIRED_EMAIL: "Email is required",
+  REQUIRED_PASSWORD: "Password is required",
+  REQUIRED_NAME: "Name must be at least 2 characters long",
+  REQUIRED_PHONE: "Phone number must be 10 digits",
 };
 
 // Complete validation function for candidate data
@@ -169,3 +227,8 @@ export const validateCandidateData = (data) => {
     errors
   };
 }; 
+
+
+
+
+

@@ -5,7 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import candidateRoutes from "./apps/candidate/routers/candidate.route.mjs";
 import { errorHandler } from "../src/middleware/error.middleware.mjs";
-
+import authRoutes from "./apps/auth/routers/auth.route.mjs";
 dotenv.config();
 
 class Server {
@@ -38,6 +38,7 @@ class Server {
 
   routes() {
     this.app.use("/api/candidates", candidateRoutes);
+    this.app.use("/api/auth", authRoutes);
   }
 
   errorHandling() {

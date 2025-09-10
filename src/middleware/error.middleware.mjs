@@ -1,46 +1,64 @@
 // Global error handling middleware
 export const errorHandler = (err, req, res, next) => {
   let statusCode = 500;
-  let message = 'Internal Server Error';
-  let errorType = 'Server Error';
+  let message = "Internal Server Error";
+  let errorType = "Server Error";
 
   // Handle different types of errors
   switch (err.name) {
-    case 'ValidationError':
+    case "ValidationError":
       statusCode = 400;
-      message = err.message || 'Validation failed';
-      errorType = 'Validation Error';
+      message = err.message || "Validation failed";
+      errorType = "Validation Error";
       break;
-      
-    case 'CastError':
+
+    case "DuplicateEmailError":
+      statusCode = 409;
+      message = err.message || "Email already exists";
+      errorType = "Duplicate Email";
+      break;
+
+    case "AuthError":
+      statusCode = 401;
+      message = err.message || "Invalid credentials";
+      errorType = "Authentication Error";
+      break;
+
+    case "UnauthorizedError": // JWT / Access token errors
+      statusCode = 403;
+      message = err.message || "You are not authorized to access this resource";
+      errorType = "Authorization Error";
+      break;
+
+    case "CastError":
       statusCode = 400;
-      message = 'Invalid ID format';
-      errorType = 'Invalid ID';
+      message = "Invalid ID format";
+      errorType = "Invalid ID";
       break;
-      
-    case 'MongoError':
+
+    case "MongoError":
       if (err.code === 11000) {
         statusCode = 409;
-        message = 'Duplicate entry found';
-        errorType = 'Duplicate Error';
+        message = "Duplicate entry found";
+        errorType = "Duplicate Error";
       }
       break;
-      
-    case 'SyntaxError':
+
+    case "SyntaxError":
       statusCode = 400;
-      message = 'Invalid JSON format';
-      errorType = 'Syntax Error';
+      message = "Invalid JSON format";
+      errorType = "Syntax Error";
       break;
-      
-    case 'TypeError':
+
+    case "TypeError":
       statusCode = 400;
-      message = 'Invalid data type';
-      errorType = 'Type Error';
+      message = "Invalid data type";
+      errorType = "Type Error";
       break;
-      
+
     default:
       // Log unexpected errors for debugging
-      console.error('Unexpected Error:', {
+      console.error("Unexpected Error:", {
         name: err.name,
         message: err.message,
         stack: err.stack,
@@ -48,7 +66,7 @@ export const errorHandler = (err, req, res, next) => {
         method: req.method,
         body: req.body,
         params: req.params,
-        query: req.query
+        query: req.query,
       });
   }
 
@@ -57,10 +75,10 @@ export const errorHandler = (err, req, res, next) => {
     success: false,
     error: errorType,
     message: message,
-    ...(process.env.NODE_ENV === 'development' && {
+    ...(process.env.NODE_ENV === "development" && {
       stack: err.stack,
-      details: err.message
-    })
+      details: err.message,
+    }),
   });
 };
 
@@ -68,8 +86,8 @@ export const errorHandler = (err, req, res, next) => {
 export const notFoundHandler = (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'Not Found',
-    message: `Route ${req.originalUrl} not found`
+    error: "Not Found",
+    message: `Route ${req.originalUrl} not found`,
   });
 };
 
