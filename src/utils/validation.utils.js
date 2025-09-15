@@ -3,13 +3,12 @@
 // Regex patterns for validation
 export const PATTERNS = {
   NAME: /^[A-Za-z\s]{2,50}$/,
-  PHONE: /^\+\d{1,3}-\d{10}$/,
+  PHONE: /^\+\d{1,3}[-\s]?\d{10}$/,
   QUALIFICATION: /^[A-Za-z\s]{2,100}$/,
   EXPERIENCE: /^([1-9]|[12]\d|30)$/,
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   OBJECT_ID: /^[0-9a-fA-F]{24}$/,
-  PASSWORD: /^.{6,}$/, // min 6 chars
-  PHONE: /^[0-9]{10}$/, // example candidate validation
+  PASSWORD: /^.{6,}$/, // min 6 chars 
 };
 
 // Validation functions

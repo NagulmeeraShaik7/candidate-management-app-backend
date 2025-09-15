@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 // Common regex patterns for validation
 const PATTERNS = {
   NAME: /^[A-Za-z\s]{2,50}$/,
-  PHONE: /^\+[1-9]\d{10,14}$/,
+  PHONE: /^\+\d{1,3}[-\s]?\d{10}$/,   // accepts +91-XXXXXXXXXX or +91 XXXXXXXXXX
   QUALIFICATION: /^[A-Za-z\s]{2,100}$/,
-  EXPERIENCE: /^([1-9]|[12]\d|30)$/,
+  EXPERIENCE: /^([1-9]|[12]\d|30)$/,  // 1–30 years
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 };
 
@@ -20,7 +20,7 @@ const candidateSchema = new mongoose.Schema({
     type: String, 
     required: [true, 'Phone number is required'],
     trim: true,
-    match: [/^\+\d{1,3}-\d{10}$/, 'Phone must be in the format (e.g., +91-9848012345)']
+    match: [PATTERNS.PHONE, 'Phone must be in the format (e.g., +91-9848012345 or +91 9848012345)']
   },
   highestqualification: { 
     type: String,
@@ -58,21 +58,19 @@ const candidateSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Optimized pre-save middleware
+// Pre-save middleware
 candidateSchema.pre('save', function(next) {
   this.sanitizeSkills();
   next();
 });
 
-// Optimized pre-update middleware
+// Pre-update middleware
 candidateSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function(next) {
   if (this._update.skills) {
-    // Use schema static method correctly
     this._update.skills = candidateSchema.statics.sanitizeSkillsArray(this._update.skills);
   }
   next();
 });
-
 
 // Method to sanitize skills array
 candidateSchema.methods.sanitizeSkills = function() {
@@ -88,7 +86,7 @@ candidateSchema.statics.sanitizeSkillsArray = function(skills) {
     .filter(skill => skill.length > 0);
 };
 
-// Index for better query performance
+// Indexes for better query performance
 candidateSchema.index({ email: 1 });
 candidateSchema.index({ name: 1 });
 candidateSchema.index({ skills: 1 });
