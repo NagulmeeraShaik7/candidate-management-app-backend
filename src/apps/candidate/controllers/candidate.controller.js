@@ -1,4 +1,4 @@
-import CandidateUseCase from "../usecases/candidate.usecase.mjs";
+import CandidateUseCase from "../usecases/candidate.usecase.js";
 
 const usecase = new CandidateUseCase();
 

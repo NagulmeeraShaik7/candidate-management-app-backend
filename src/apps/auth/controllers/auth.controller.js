@@ -1,4 +1,4 @@
-import { asyncHandler } from "../../../middleware/error.middleware.mjs";
+import { asyncHandler } from "../../../middleware/error.middleware.js";
 
 class AuthController {
   constructor(authUsecase) {

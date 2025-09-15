@@ -1,4 +1,4 @@
-import Candidate from "../models/candidate.model.mjs";
+import Candidate from "../models/candidate.model.js";
 
 export default class CandidateRepository {
   async findAll() {
