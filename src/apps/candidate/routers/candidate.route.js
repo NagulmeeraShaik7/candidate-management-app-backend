@@ -1,6 +1,6 @@
 import express from "express";
-import * as controller from "../controllers/candidate.controller.mjs";
-import { validateCandidate, handleValidationErrors, sanitizeSkills } from "../../../middleware/validation.middleware.mjs";
+import * as controller from "../controllers/candidate.controller.js";
+import { validateCandidate, handleValidationErrors, sanitizeSkills } from "../../../middleware/validation.middleware.js";
 
 const router = express.Router();
 

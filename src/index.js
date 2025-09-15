@@ -3,9 +3,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import candidateRoutes from "./apps/candidate/routers/candidate.route.mjs";
-import { errorHandler } from "../src/middleware/error.middleware.mjs";
-import authRoutes from "./apps/auth/routers/auth.route.mjs";
+import candidateRoutes from "./apps/candidate/routers/candidate.route.js";
+import { errorHandler } from "../src/middleware/error.middleware.js";
+import authRoutes from "./apps/auth/routers/auth.route.js";
 dotenv.config();
 
 class Server {

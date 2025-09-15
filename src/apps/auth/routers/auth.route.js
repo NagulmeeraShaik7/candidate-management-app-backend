@@ -1,8 +1,8 @@
 import express from "express";
-import AuthRepository from "../repositories/auth.repository.mjs";
-import AuthUsecase from "../usecases/auth.usecase.mjs";
-import AuthController from "../controllers/auth.controller.mjs";
-import { validateRegister, validateLogin } from "../../../middleware/auth.validation.mjs";
+import AuthRepository from "../repositories/auth.repository.js";
+import AuthUsecase from "../usecases/auth.usecase.js";
+import AuthController from "../controllers/auth.controller.js";
+import { validateRegister, validateLogin } from "../../../middleware/auth.validation.js";
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-import CandidateRepository from "../repositories/candidate.repository.mjs";
-import { validators, sanitizers, validateCandidateData, ERROR_MESSAGES } from "../../../utils/validation.utils.mjs";
+import CandidateRepository from "../repositories/candidate.repository.js";
+import { validators, sanitizers, validateCandidateData, ERROR_MESSAGES } from "../../../utils/validation.utils.js";
 
 const repo = new CandidateRepository();
 

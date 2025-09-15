@@ -1,4 +1,4 @@
-import UserModel from "../models/auth.model.mjs";
+import UserModel from "../models/auth.model.js";
 
 class AuthRepository {
   async create(userObj) {

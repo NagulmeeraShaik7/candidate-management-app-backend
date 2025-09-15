@@ -1,5 +1,5 @@
 import { body, validationResult } from 'express-validator';
-import { PATTERNS, ERROR_MESSAGES } from '../utils/validation.utils.mjs';
+import { PATTERNS, ERROR_MESSAGES } from '../utils/validation.utils.js';
 
 // Validation rules for candidate data
 export const validateCandidate = [
