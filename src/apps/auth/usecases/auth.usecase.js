@@ -7,11 +7,12 @@ export default class AuthUsecase {
     this.saltRounds = 10;
   }
 
-  #signJwt(payload) {
+  #signJwt(payload, options = {}) {
     const secret = process.env.JWT_SECRET;
     const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
     if (!secret) throw new Error("JWT_SECRET not set in environment");
-    return jwt.sign(payload, secret, { expiresIn });
+
+    return jwt.sign(payload, secret, { expiresIn, ...options });
   }
 
   async register({ email, password, name }) {
@@ -24,6 +25,8 @@ export default class AuthUsecase {
 
     const passwordHash = await bcrypt.hash(password, this.saltRounds);
     const saved = await this.authRepository.create({ email, passwordHash, name });
+
+    // 🔹 Registration token: NO login flag
     const token = this.#signJwt({ sub: saved._id, email: saved.email });
 
     return {
@@ -52,7 +55,13 @@ export default class AuthUsecase {
       throw err;
     }
 
-    const token = this.#signJwt({ sub: user._id, email: user.email });
+    // 🔹 Login token: mark with isLoginToken
+    const token = this.#signJwt({
+      sub: user._id,
+      email: user.email,
+      isLoginToken: true,
+    });
+
     return {
       user: {
         id: user._id,
@@ -65,7 +74,7 @@ export default class AuthUsecase {
   }
 
   async logout(token) {
-    // Optional: maintain a blacklist in DB/Redis
+    // Optional: add token blacklist handling
     return { message: "Logged out successfully. Please discard your token." };
   }
 }

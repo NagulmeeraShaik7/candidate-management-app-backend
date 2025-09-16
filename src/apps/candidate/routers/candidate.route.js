@@ -1,9 +1,16 @@
-// candidate.router.js
 import express from "express";
-import  candidateController  from "../controllers/candidate.controller.js";
-import { validateCandidate, handleValidationErrors, sanitizeSkills } from "../../../middleware/validation.middleware.js";
+import candidateController from "../controllers/candidate.controller.js";
+import {
+  validateCandidate,
+  handleValidationErrors,
+  sanitizeSkills,
+} from "../../../middleware/validation.middleware.js";
+import AuthMiddleware from "../../../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+// All routes protected
+router.use(AuthMiddleware.authenticate);
 
 router.get("/", candidateController.list);
 router.get("/stats/top-skills", candidateController.topSkills);

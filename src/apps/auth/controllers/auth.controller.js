@@ -4,7 +4,6 @@ class AuthController {
   constructor(authUsecase) {
     this.authUsecase = authUsecase;
 
-    // Bind methods
     this.register = asyncHandler(this.register.bind(this));
     this.login = asyncHandler(this.login.bind(this));
     this.logout = asyncHandler(this.logout.bind(this));
