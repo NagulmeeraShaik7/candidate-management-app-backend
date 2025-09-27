@@ -6,7 +6,10 @@ import dotenv from "dotenv";
 import candidateRoutes from "./apps/candidate/routers/candidate.route.js";
 import { errorHandler } from "../src/middleware/error.middleware.js";
 import authRoutes from "./apps/auth/routers/auth.route.js";
+import examRoutes from "./apps/exam/routers/exam.route.js";
 dotenv.config();
+
+
 
 class Server {
   constructor() {
@@ -39,6 +42,7 @@ class Server {
   routes() {
     this.app.use("/api/candidates", candidateRoutes);
     this.app.use("/api/auth", authRoutes);
+    this.app.use("/api/exam", examRoutes )
   }
 
   errorHandling() {
