@@ -3,12 +3,11 @@ import mongoose from "mongoose";
 
 const questionSchema = new mongoose.Schema({
   question: { type: String, required: true },
-  options: [{ type: String }], // Array of strings for MCQ options
-  correctAnswer: { type: String, required: true }, // Single string answer
+  options: [{ type: String }],
+  correctAnswer: { type: mongoose.Schema.Types.Mixed, required: true },
   type: { 
     type: String, 
-    enum: ["mcq", "short", "descriptive"], 
-    default: "mcq",
+    enum: ["mcq", "msq", "short", "descriptive"], 
     required: true 
   }
 });
@@ -24,7 +23,7 @@ const examSchema = new mongoose.Schema({
     type: Map, 
     of: mongoose.Schema.Types.Mixed, 
     default: new Map() 
-  }, // Better than Object for querying
+  },
   score: { 
     type: Number, 
     default: null 
@@ -47,6 +46,19 @@ const examSchema = new mongoose.Schema({
 }, { 
   timestamps: true 
 });
+
+// Convert Map to Object when converting to JSON
+examSchema.methods.toJSON = function() {
+  const exam = this.toObject();
+  if (exam.submittedAnswers instanceof Map) {
+    exam.submittedAnswers = Object.fromEntries(exam.submittedAnswers);
+  } else if (exam.submittedAnswers && typeof exam.submittedAnswers === 'object') {
+    // Already an object, no conversion needed
+  } else {
+    exam.submittedAnswers = {};
+  }
+  return exam;
+};
 
 // Index for better query performance
 examSchema.index({ candidateId: 1 });

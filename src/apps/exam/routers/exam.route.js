@@ -4,7 +4,7 @@ import examController from "../controllers/exam.controller.js";
 import AuthMiddleware from "../../../middleware/auth.middleware.js";
 
 const router = express.Router();
-//router.use(AuthMiddleware.authenticate);
+// router.use(AuthMiddleware.authenticate); // Uncomment when ready to use auth
 
 router.post("/generate", examController.generate);
 router.get("/:id", examController.get);

@@ -15,8 +15,23 @@ class ExamRepository {
     return Exam.findById(id).populate("candidateId").exec();
   }
 
+  async findLatestByCandidate(candidateId) {
+    return await Exam.findOne({ candidateId })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
   async updateExam(id, data) {
-    return Exam.findByIdAndUpdate(id, data, { new: true }).exec();
+    // Convert answers object to Map for storage
+    if (data.submittedAnswers && typeof data.submittedAnswers === 'object') {
+      data.submittedAnswers = new Map(Object.entries(data.submittedAnswers));
+    }
+    
+    return Exam.findByIdAndUpdate(id, data, { new: true, runValidators: true }).exec();
+  }
+
+  async findByCandidateId(candidateId) {
+    return Exam.find({ candidateId }).sort({ createdAt: -1 }).exec();
   }
 }
 

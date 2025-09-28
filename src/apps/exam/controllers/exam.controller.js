@@ -4,8 +4,15 @@ import { asyncHandler } from "../../../middleware/error.middleware.js";
 
 const usecase = new ExamUseCase();
 
-const sendSuccess = (res, data, status = 200) => res.status(status).json({ success: true, data });
-const sendError = (res, err) => res.status(err.code || 500).json({ success: false, error: err.name, message: err.message });
+const sendSuccess = (res, data, status = 200) =>
+  res.status(status).json({ success: true, data });
+
+const sendError = (res, err) =>
+  res.status(err.code || 500).json({
+    success: false,
+    error: err.name,
+    message: err.message,
+  });
 
 class ExamController {
   generate = asyncHandler(async (req, res) => {
@@ -28,7 +35,18 @@ class ExamController {
 
   submit = asyncHandler(async (req, res) => {
     try {
-      const updated = await usecase.submitExam(req.params.id, req.body.answers);
+      const { answers } = req.body;
+      console.log("Received answers for submission:", answers);
+      
+      if (!answers || typeof answers !== 'object') {
+        return sendError(res, {
+          code: 400,
+          name: "ValidationError",
+          message: "Answers must be provided as an object"
+        });
+      }
+      
+      const updated = await usecase.submitExam(req.params.id, answers);
       return sendSuccess(res, updated);
     } catch (err) {
       return sendError(res, err);
