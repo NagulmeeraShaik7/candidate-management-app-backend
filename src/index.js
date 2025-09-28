@@ -1,15 +1,13 @@
-// 📁 index.mjs
+// index.mjs
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import candidateRoutes from "./apps/candidate/routers/candidate.route.js";
-import { errorHandler } from "../src/middleware/error.middleware.js";
+import { errorHandler, notFoundHandler } from "../src/middleware/error.middleware.js";
 import authRoutes from "./apps/auth/routers/auth.route.js";
 import examRoutes from "./apps/exam/routers/exam.route.js";
 dotenv.config();
-
-
 
 class Server {
   constructor() {
@@ -36,16 +34,27 @@ class Server {
 
   middlewares() {
     this.app.use(cors());
-    this.app.use(express.json());
+    this.app.use(express.json({ limit: '10mb' }));
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
   routes() {
     this.app.use("/api/candidates", candidateRoutes);
     this.app.use("/api/auth", authRoutes);
-    this.app.use("/api/exam", examRoutes )
+    this.app.use("/api/exam", examRoutes);
+    
+    // Health check route
+    this.app.get("/health", (req, res) => {
+      res.status(200).json({ 
+        success: true, 
+        message: "Server is running", 
+        timestamp: new Date().toISOString() 
+      });
+    });
   }
 
   errorHandling() {
+    this.app.use(notFoundHandler);
     this.app.use(errorHandler);
   }
 
