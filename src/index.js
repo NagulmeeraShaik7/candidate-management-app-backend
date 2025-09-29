@@ -7,6 +7,7 @@ import candidateRoutes from "./apps/candidate/routers/candidate.route.js";
 import { errorHandler, notFoundHandler } from "../src/middleware/error.middleware.js";
 import authRoutes from "./apps/auth/routers/auth.route.js";
 import examRoutes from "./apps/exam/routers/exam.route.js";
+import proctoringRoutes from "./apps/proctoring/routers/proctoring.route.js";
 dotenv.config();
 
 class Server {
@@ -42,6 +43,7 @@ class Server {
     this.app.use("/api/candidates", candidateRoutes);
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/exam", examRoutes);
+    this.app.use("/api/proctoring", proctoringRoutes);
     
     // Health check route
     this.app.get("/health", (req, res) => {
