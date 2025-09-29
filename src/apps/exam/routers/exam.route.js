@@ -9,7 +9,7 @@ const roleMiddleware = new RoleMiddleware();
 
 // All routes protected
 router.use(AuthMiddleware.authenticate);
-router.use(roleMiddleware.requireRole('admin', 'user'));
+router.use(roleMiddleware.requireRole('user'));
 
 router.post("/generate", examController.generate);
 router.get("/:id", examController.get);
