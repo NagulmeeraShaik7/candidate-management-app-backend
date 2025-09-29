@@ -1,5 +1,6 @@
 import { asyncHandler } from "../../../middleware/error.middleware.js";
 
+
 class AuthController {
   constructor(authUsecase) {
     this.authUsecase = authUsecase;
@@ -10,19 +11,20 @@ class AuthController {
   }
 
   async register(req, res) {
-    const { email, password, name } = req.body;
-    const { user, token } = await this.authUsecase.register({ email, password, name });
+    const { email, password, name, role } = req.body;
+    const { user, token } = await this.authUsecase.register({ email, password, name, role });
 
     res.status(201).json({
       success: true,
       message: "User registered successfully",
       data: { user, token },
     });
+
   }
 
   async login(req, res) {
-    const { email, password } = req.body;
-    const { user, token } = await this.authUsecase.login({ email, password });
+    const { email, password, role } = req.body;
+    const { user, token } = await this.authUsecase.login({ email, password, role });
 
     res.status(200).json({
       success: true,
