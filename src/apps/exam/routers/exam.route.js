@@ -5,9 +5,11 @@ import AuthMiddleware from "../../../middleware/auth.middleware.js";
 import RoleMiddleware from "../../../middleware/role.middleware.js";
 
 const router = express.Router();
-router.use(AuthMiddleware.authenticate);
+const roleMiddleware = new RoleMiddleware();
 
-router.use(RoleMiddleware.authorize(['admin', 'user']));
+// All routes protected
+router.use(AuthMiddleware.authenticate);
+router.use(roleMiddleware.requireRole('admin', 'user'));
 
 router.post("/generate", examController.generate);
 router.get("/:id", examController.get);
