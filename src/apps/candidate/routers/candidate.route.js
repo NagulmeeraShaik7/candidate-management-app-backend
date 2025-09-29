@@ -10,12 +10,13 @@ import RoleMiddleware from "../../../middleware/role.middleware.js";
 
 
 const router = express.Router();
+const roleMiddleware = new RoleMiddleware();
 
 // All routes protected
 router.use(AuthMiddleware.authenticate);
+router.use(roleMiddleware.requireRole('admin'));
 
 
-router.use(RoleMiddleware.authorize(['admin']));
 
 
 router.get("/",candidateController.list);
