@@ -15,7 +15,7 @@ export default class AuthUsecase {
     return jwt.sign(payload, secret, { expiresIn, ...options });
   }
 
-  async register({ email, password, name }) {
+  async register({ email, password, name, role }) {
     const existing = await this.authRepository.findByEmail(email);
     if (existing) {
       const err = new Error("Email already registered. Please login instead.");
@@ -24,7 +24,7 @@ export default class AuthUsecase {
     }
 
     const passwordHash = await bcrypt.hash(password, this.saltRounds);
-    const saved = await this.authRepository.create({ email, passwordHash, name });
+    const saved = await this.authRepository.create({ email, passwordHash, name, role });
 
     // 🔹 Registration token: NO login flag
     const token = this.#signJwt({ sub: saved._id, email: saved.email });
@@ -34,13 +34,14 @@ export default class AuthUsecase {
         id: saved._id,
         email: saved.email,
         name: saved.name,
+        role: saved.role,
         createdAt: saved.createdAt,
       },
       token,
     };
   }
 
-  async login({ email, password }) {
+  async login({ email, password, role }) {
     const user = await this.authRepository.findByEmail(email);
     if (!user) {
       const err = new Error("No account found with this email.");
@@ -54,12 +55,19 @@ export default class AuthUsecase {
       err.name = "AuthError";
       throw err;
     }
+    if (role && user.role !== role) {
+      const err = new Error("Unauthorized role access.");
+      err.name = "AuthError";
+      throw err;
+    }
 
     // 🔹 Login token: mark with isLoginToken
     const token = this.#signJwt({
       sub: user._id,
       email: user.email,
+      role: user.role,
       isLoginToken: true,
+
     });
 
     return {
@@ -67,6 +75,7 @@ export default class AuthUsecase {
         id: user._id,
         email: user.email,
         name: user.name,
+        role: user.role,
         createdAt: user.createdAt,
       },
       token,
