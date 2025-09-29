@@ -8,22 +8,40 @@ import {
 import AuthMiddleware from "../../../middleware/auth.middleware.js";
 import RoleMiddleware from "../../../middleware/role.middleware.js";
 
-
 const router = express.Router();
 const roleMiddleware = new RoleMiddleware();
 
-// All routes protected
+// ✅ All routes require authentication
 router.use(AuthMiddleware.authenticate);
-//router.use(roleMiddleware.requireRole('admin'));
 
+// ✅ GET routes — allow both 'user' and 'admin'
+router.get("/", roleMiddleware.requireRole(['user', 'admin']), candidateController.list);
+router.get("/stats/top-skills", roleMiddleware.requireRole(['user', 'admin']), candidateController.topSkills);
+router.get("/:id", roleMiddleware.requireRole(['user', 'admin']), candidateController.get);
 
+// ✅ POST / PUT / DELETE — admin only
+router.post(
+  "/",
+  roleMiddleware.requireRole(['admin']),
+  validateCandidate,
+  handleValidationErrors,
+  sanitizeSkills,
+  candidateController.create
+);
 
+router.put(
+  "/:id",
+  roleMiddleware.requireRole(['admin']),
+  validateCandidate,
+  handleValidationErrors,
+  sanitizeSkills,
+  candidateController.update
+);
 
-router.get("/", roleMiddleware.requireRole('user'), candidateController.list);
-router.get("/stats/top-skills", roleMiddleware.requireRole('user'), candidateController.topSkills);
-router.get("/:id", roleMiddleware.requireRole('user'), candidateController.get);
-router.post("/", roleMiddleware.requireRole('admin'), validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.create);
-router.put("/:id", roleMiddleware.requireRole('admin'), validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.update);
-router.delete("/:id", roleMiddleware.requireRole('admin'), candidateController.remove);
+router.delete(
+  "/:id",
+  roleMiddleware.requireRole(['admin']),
+  candidateController.remove
+);
 
 export default router;
