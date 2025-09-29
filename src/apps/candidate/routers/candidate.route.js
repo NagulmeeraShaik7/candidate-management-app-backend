@@ -14,16 +14,16 @@ const roleMiddleware = new RoleMiddleware();
 
 // All routes protected
 router.use(AuthMiddleware.authenticate);
-router.use(roleMiddleware.requireRole('admin'));
+//router.use(roleMiddleware.requireRole('admin'));
 
 
 
 
-router.get("/",candidateController.list);
-router.get("/stats/top-skills", candidateController.topSkills);
-router.get("/:id", candidateController.get);
-router.post("/",  validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.create);
-router.put("/:id", validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.update);
-router.delete("/:id", candidateController.remove);
+router.get("/", roleMiddleware.requireRole('user'), candidateController.list);
+router.get("/stats/top-skills", roleMiddleware.requireRole('user'), candidateController.topSkills);
+router.get("/:id", roleMiddleware.requireRole('user'), candidateController.get);
+router.post("/", roleMiddleware.requireRole('admin'), validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.create);
+router.put("/:id", roleMiddleware.requireRole('admin'), validateCandidate, handleValidationErrors, sanitizeSkills, candidateController.update);
+router.delete("/:id", roleMiddleware.requireRole('admin'), candidateController.remove);
 
 export default router;
