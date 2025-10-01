@@ -44,6 +44,10 @@ const ProctoringLogSchema = new mongoose.Schema({
 // Indexes for quick queries by examId + createdAt
 ProctoringLogSchema.index({ examId: 1, createdAt: -1 });
 ProctoringLogSchema.index({ candidateId: 1, createdAt: -1 });
+// Additional indexes for admin queries
+ProctoringLogSchema.index({ activityType: 1, createdAt: -1 });
+ProctoringLogSchema.index({ severity: 1, createdAt: -1 });
+ProctoringLogSchema.index({ createdAt: -1 });
 
 const ProctoringLog = mongoose.model("ProctoringLog", ProctoringLogSchema);
 export default ProctoringLog;

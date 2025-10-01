@@ -48,6 +48,65 @@ class ProctoringController {
       return sendError(res, err);
     }
   });
+
+  // GET /api/proctoring/admin/all-logs
+  getAllLogs = asyncHandler(async (req, res) => {
+    try {
+      const { 
+        page = 1, 
+        limit = 50, 
+        examId, 
+        candidateId, 
+        activityType, 
+        severity,
+        startDate,
+        endDate 
+      } = req.query;
+      
+      const filters = {};
+      if (examId) filters.examId = examId;
+      if (candidateId) filters.candidateId = candidateId;
+      if (activityType) filters.activityType = activityType;
+      if (severity) filters.severity = severity;
+      if (startDate || endDate) {
+        filters.createdAt = {};
+        if (startDate) filters.createdAt.$gte = new Date(startDate);
+        if (endDate) filters.createdAt.$lte = new Date(endDate);
+      }
+
+      const options = {
+        page: parseInt(page, 10),
+        limit: Math.min(parseInt(limit, 10), 100), // max 100 per page
+        sort: { createdAt: -1 }
+      };
+
+      const result = await usecase.getAllLogsForAdmin(filters, options);
+      return sendSuccess(res, result);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
+
+  // GET /api/proctoring/admin/violations-summary
+  getViolationsSummary = asyncHandler(async (req, res) => {
+    try {
+      const { examId, candidateId, startDate, endDate } = req.query;
+      
+      const filters = {};
+      if (examId) filters.examId = examId;
+      if (candidateId) filters.candidateId = candidateId;
+      if (startDate || endDate) {
+        filters.createdAt = {};
+        if (startDate) filters.createdAt.$gte = new Date(startDate);
+        if (endDate) filters.createdAt.$lte = new Date(endDate);
+      }
+
+      const summary = await usecase.getViolationsSummary(filters);
+      return sendSuccess(res, summary);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
 }
 
 export default new ProctoringController();
