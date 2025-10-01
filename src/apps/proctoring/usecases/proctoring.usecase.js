@@ -4,8 +4,6 @@ import CandidateRepository from "../../candidate/repositories/candidate.reposito
 import ExamRepository from "../../exam/repositories/exam.repository.js";
 import { AppError } from "../../../middleware/error.middleware.js";
 
-
-
 const repo = new ProctoringRepository();
 const candidateRepo = new CandidateRepository();
 const examRepo = new ExamRepository();
@@ -74,6 +72,20 @@ class ProctoringUseCase {
       countsBySeverity,
       logs
     };
+  }
+
+  /**
+   * Get all proctoring logs for admin with filtering and pagination
+   */
+  async getAllLogsForAdmin(filters = {}, options = {}) {
+    return repo.getAllLogs(filters, options);
+  }
+
+  /**
+   * Get violations summary for admin dashboard
+   */
+  async getViolationsSummary(filters = {}) {
+    return repo.getViolationsSummary(filters);
   }
 }
 
