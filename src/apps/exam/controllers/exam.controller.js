@@ -61,6 +61,67 @@ class ExamController {
       return sendError(res, err);
     }
   });
+
+  // NEW: Get all results with filtering and pagination
+  getAllResults = asyncHandler(async (req, res) => {
+    try {
+      const { 
+        page = 1, 
+        limit = 10, 
+        candidateId, 
+        status, 
+        qualified 
+      } = req.query;
+      
+      const results = await usecase.getAllResults({
+        page: parseInt(page),
+        limit: parseInt(limit),
+        candidateId,
+        status,
+        qualified: qualified !== undefined ? qualified === 'true' : undefined
+      });
+      
+      return sendSuccess(res, results);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
+
+  // NEW: Get detailed exam for admin review
+  getExamForReview = asyncHandler(async (req, res) => {
+    try {
+      const exam = await usecase.getExamForReview(req.params.id);
+      return sendSuccess(res, exam);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
+
+  // NEW: Admin manual grading for descriptive answers
+  manualGrading = asyncHandler(async (req, res) => {
+    try {
+      const { questionId, score, feedback } = req.body;
+      
+      if (!questionId || score === undefined) {
+        return sendError(res, {
+          code: 400,
+          name: "ValidationError",
+          message: "Question ID and score are required"
+        });
+      }
+
+      const updatedExam = await usecase.manualGrading(
+        req.params.id, 
+        questionId, 
+        parseInt(score),
+        feedback
+      );
+      
+      return sendSuccess(res, updatedExam);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
 }
 
 export default new ExamController();
