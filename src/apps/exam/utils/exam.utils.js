@@ -282,21 +282,3 @@ export function canAttemptExam(lastExamDate, currentDate = new Date()) {
   const diffDays = (currentDate - last) / (1000 * 60 * 60 * 24);
   return diffDays >= 10;
 }
-
-// Utility to check if exam needs manual review
-export const needsManualReview = (exam) => {
-  if (exam.status === 'manually_graded') return false;
-  
-  const hasDescriptiveQuestions = exam.questions.some(q => 
-    ["short", "descriptive"].includes(q.type)
-  );
-  
-  return hasDescriptiveQuestions && exam.status === 'graded';
-};
-
-// Calculate final score considering manual grading
-export const calculateFinalScore = (exam) => {
-  const autoGradedScore = exam.score || 0;
-  const manualScore = exam.manualScore || 0;
-  return autoGradedScore + manualScore;
-};
