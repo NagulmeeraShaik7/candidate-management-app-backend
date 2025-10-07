@@ -261,6 +261,55 @@ class ExamUseCase {
 
     return updated;
   }
+
+  /**
+   * Finalize a manual review of an exam.
+   * approvals: object with string indexes as keys and boolean values indicating per-question approval
+   * makeVisibleImmediately: boolean - if true, set visibleAt to now, otherwise leave unchanged
+   */
+  async finalizeReview(id, approvals = {}, makeVisibleImmediately = true) {
+    console.log("finalizeReview called with id:", id, "approvals:", approvals, "makeVisibleImmediately:", makeVisibleImmediately);
+    const exam = await repo.findById(id);
+    if (!exam) throw new AppError("Exam not found", 404, "NotFoundError");
+
+    // Normalize submittedAnswers from Map to object if needed
+    let submittedAnswers = {};
+    if (exam.submittedAnswers instanceof Map) {
+      submittedAnswers = Object.fromEntries(exam.submittedAnswers);
+    } else if (exam.submittedAnswers && typeof exam.submittedAnswers === 'object') {
+      submittedAnswers = exam.submittedAnswers;
+    }
+
+    // Recompute score: auto-evaluate mcq/msq, use approvals for short/descriptive
+    let score = 0;
+    for (let i = 0; i < exam.questions.length; i++) {
+      const q = exam.questions[i];
+      const key = i.toString();
+      const given = submittedAnswers[key];
+
+      if (!q) continue;
+
+      if (q.type === 'short' || q.type === 'descriptive') {
+        const approved = approvals && Object.prototype.hasOwnProperty.call(approvals, key) ? !!approvals[key] : false;
+        if (approved) score++;
+      } else {
+        if (isAnswerCorrect(q, given)) score++;
+      }
+    }
+
+    const visibleAt = makeVisibleImmediately ? new Date() : (exam.visibleAt || null);
+
+    const updated = await repo.updateExam(id, {
+      score,
+      status: 'graded',
+      gradedAt: new Date(),
+      approved: true,
+      approvedAt: new Date(),
+      visibleAt
+    });
+
+    return updated;
+  }
 }
 
 export default ExamUseCase;
