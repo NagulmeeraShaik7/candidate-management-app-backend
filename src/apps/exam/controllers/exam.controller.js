@@ -84,6 +84,18 @@ class ExamController {
       return sendError(res, err);
     }
   });
+
+  // Admin: finalize manual review and optionally make visible immediately
+  finalizeReview = asyncHandler(async (req, res) => {
+    try {
+      const approvals = req.body.approvals || {};
+      const makeVisibleImmediately = req.body.makeVisibleImmediately !== undefined ? !!req.body.makeVisibleImmediately : true;
+      const data = await usecase.finalizeReview(req.params.id, approvals, makeVisibleImmediately);
+      return sendSuccess(res, data);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
 }
 
 export default new ExamController();

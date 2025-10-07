@@ -20,5 +20,6 @@ router.get("/:id/result", examController.result);
 // Admin-only endpoints
 router.get("/", roleMiddleware.requireRole('admin'), examController.list);
 router.post("/:id/approve", roleMiddleware.requireRole('admin'), examController.approve);
+router.post("/:id/finalize-review", roleMiddleware.requireRole('admin'), examController.finalizeReview);
 
 export default router;
