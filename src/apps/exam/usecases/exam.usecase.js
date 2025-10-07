@@ -231,6 +231,36 @@ class ExamUseCase {
     console.log("Exam result:", result);
     return result;
   }
+
+  // Admin: list exams with pagination
+  async listExams(page = 1, limit = 50) {
+    const skip = (page - 1) * limit;
+    const exams = await repo.findAll({ skip, limit });
+    return exams;
+  }
+
+  // Admin: approve an exam and set visibleAt based on delayMinutes
+  async approveExam(id, delayMinutes = 60) {
+    console.log("approveExam called with id:", id, "delayMinutes:", delayMinutes);
+    const exam = await repo.findById(id);
+    if (!exam) throw new AppError("Exam not found", 404, "NotFoundError");
+
+    // Only allow approving generated or graded exams
+    if (!["generated", "graded"].includes(exam.status)) {
+      throw new AppError("Exam cannot be approved in its current state", 400, "InvalidState");
+    }
+
+    const visibleAt = new Date(Date.now() + Math.max(0, Number(delayMinutes)) * 60 * 1000);
+
+    const updated = await repo.updateExam(id, {
+      approved: true,
+      approvedAt: new Date(),
+      visibleAt,
+      status: exam.status // keep current status (graded stays graded)
+    });
+
+    return updated;
+  }
 }
 
 export default ExamUseCase;

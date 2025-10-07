@@ -33,6 +33,15 @@ class ExamRepository {
   async findByCandidateId(candidateId) {
     return Exam.find({ candidateId }).sort({ createdAt: -1 }).exec();
   }
+
+  async findAll({ skip = 0, limit = 50 } = {}) {
+    return Exam.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('candidateId')
+      .exec();
+  }
 }
 
 export default ExamRepository;
