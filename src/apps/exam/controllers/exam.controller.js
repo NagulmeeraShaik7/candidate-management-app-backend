@@ -61,6 +61,29 @@ class ExamController {
       return sendError(res, err);
     }
   });
+
+  // Admin: list exams (paginated)
+  list = asyncHandler(async (req, res) => {
+    try {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 50;
+      const exams = await usecase.listExams(page, limit);
+      return sendSuccess(res, exams);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
+
+  // Admin: approve exam
+  approve = asyncHandler(async (req, res) => {
+    try {
+      const delayMinutes = req.body.delayMinutes !== undefined ? Number(req.body.delayMinutes) : 60;
+      const data = await usecase.approveExam(req.params.id, delayMinutes);
+      return sendSuccess(res, data);
+    } catch (err) {
+      return sendError(res, err);
+    }
+  });
 }
 
 export default new ExamController();

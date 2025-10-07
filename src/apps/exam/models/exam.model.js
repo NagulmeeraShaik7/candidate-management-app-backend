@@ -33,6 +33,17 @@ const examSchema = new mongoose.Schema({
     enum: ["generated", "submitted", "graded"], 
     default: "generated" 
   },
+  // Admin approval fields
+  approved: {
+    type: Boolean,
+    default: false
+  },
+  approvedAt: {
+    type: Date
+  },
+  visibleAt: {
+    type: Date
+  },
   generatedAt: { 
     type: Date, 
     default: Date.now 
@@ -57,6 +68,10 @@ examSchema.methods.toJSON = function() {
   } else {
     exam.submittedAnswers = {};
   }
+  // ensure approval fields exist
+  exam.approved = exam.approved || false;
+  exam.approvedAt = exam.approvedAt || null;
+  exam.visibleAt = exam.visibleAt || null;
   return exam;
 };
 
@@ -64,6 +79,8 @@ examSchema.methods.toJSON = function() {
 examSchema.index({ candidateId: 1 });
 examSchema.index({ status: 1 });
 examSchema.index({ createdAt: -1 });
+examSchema.index({ approved: 1 });
+examSchema.index({ visibleAt: 1 });
 
 const Exam = mongoose.model("Exam", examSchema);
 export default Exam;
